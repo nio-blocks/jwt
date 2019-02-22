@@ -10,20 +10,40 @@ class TestJWTCreate(NIOBlockTestCase):
         config = {
           'key': 'secret',
           'algorithm': 'HS256',
-          'exp_minutes': None,
+          'exp_minutes': '',
           'claims': '{{ $claims }}'
         }
 
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
+        blk.process_signal(Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] }))
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token creation successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
         self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), { 'user_id': 'myUserId'})
+        blk.stop()
+
+    def test_create_token_without_claims(self):
+        config = {
+          'key': 'secret',
+          'algorithm': 'HS256',
+          'exp_minutes': '',
+          'claims': '{{ $claims }}'
+        }
+
+        blk = JWTCreate()
+        blk.start()
+        self.configure_block(blk, config)
+        blk.process_signal(Signal({ 'claims' : [] }))
+        self.assert_num_signals_notified(1, blk)
+        self.assertEqual('Token creation successful', self.last_signal_notified().message)
+        self.assertEqual(0, self.last_signal_notified().error)
+        self.assertIsNotNone(self.last_signal_notified().token)
+        self.assertEqual(type(self.last_signal_notified().token), str)
+        self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), {})
         blk.stop()
 
     def test_create_token_with_expiration(self):
@@ -38,7 +58,7 @@ class TestJWTCreate(NIOBlockTestCase):
         blk.start()
         self.configure_block(blk, config)
         expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
-        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
+        blk.process_signal(Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] }))
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token creation successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
@@ -95,7 +115,7 @@ qQIDAQAB
         blk.start()
         self.configure_block(blk, config)
         expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
-        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
+        blk.process_signal(Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] }))
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token creation successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
@@ -115,9 +135,9 @@ qQIDAQAB
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
+        blk.process_signal(Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] }))
         self.assert_num_signals_notified(1, blk)
-        self.assertEqual('Could not create new token: Could not deserialize key data.', self.last_signal_notified().message)
+        self.assertEqual('Could not deserialize key data.', self.last_signal_notified().message)
         self.assertEqual(1, self.last_signal_notified().error)
         self.assertIsNone(self.last_signal_notified().token)
         blk.stop()
