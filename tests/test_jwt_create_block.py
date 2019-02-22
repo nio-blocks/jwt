@@ -10,7 +10,7 @@ class TestJWTCreate(NIOBlockTestCase):
         config = {
           'key': 'secret',
           'algorithm': 'HS256',
-          'exp_minutes': '',
+          'exp_minutes': None,
           'claims': '{{ $claims }}'
         }
 
@@ -30,7 +30,7 @@ class TestJWTCreate(NIOBlockTestCase):
         config = {
           'key': 'secret',
           'algorithm': 'HS256',
-          'exp_minutes': '',
+          'exp_minutes': None,
           'claims': '{{ $claims }}'
         }
 
