@@ -19,7 +19,7 @@ class JWTRefresh(EnrichSignals, JWTBase):
         try:
             _claims = jwt.decode(_token, _key, algorithms=[_algorithm.value])
         
-            if 'exp' in _claims:
+            if 'exp' in _claims and isinstance(_exp_minutes, int):
                 _claims['exp'] = self.set_new_exp_time(_exp_minutes)
         
             _token = jwt.encode(_claims, _key, algorithm=_algorithm.value)

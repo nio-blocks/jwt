@@ -24,8 +24,4 @@ class JWTBase(Block):
     algorithm = SelectProperty(Algorithms, title='Hashing Algorithm', default=Algorithms.HS256, order=2)
 
     def set_new_exp_time(self, exp_minutes):
-        try: 
-            _exp_minutes = int(exp_minutes)
-            return int((datetime.datetime.utcnow() + datetime.timedelta(minutes=int(exp_minutes))).timestamp())
-        except Exception:
-            return None
+        return int((datetime.datetime.utcnow() + datetime.timedelta(minutes=int(exp_minutes))).timestamp())

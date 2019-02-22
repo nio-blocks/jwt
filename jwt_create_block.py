@@ -1,6 +1,6 @@
 from nio import Block
 from nio.block.mixins import EnrichSignals
-from nio.properties import PropertyHolder, StringProperty, Property, ListProperty, VersionProperty, IntProperty
+from nio.properties import PropertyHolder, StringProperty, Property, ListProperty, VersionProperty
 from .jwt_base import JWTBase
 import jwt
 
@@ -11,7 +11,7 @@ class ClaimField(PropertyHolder):
 class JWTCreate(EnrichSignals, JWTBase):
     version = VersionProperty('0.1.0')
 
-    exp_minutes = IntProperty(title='Valid For Minutes (exp claim)', default=60, order=3, allow_none=True)
+    exp_minutes = Property(title='Valid For Minutes (blank for no exp claim)', order=3, allow_none=True)
     claims = ListProperty(ClaimField, title='Claims', order=4, allow_none=True)
 
     def process_signal(self, signal):
@@ -22,8 +22,8 @@ class JWTCreate(EnrichSignals, JWTBase):
         _newclaims = {}
 
         try:
-            if _exp_minutes:
-                _newclaims['exp'] = self.set_new_exp_time(_exp_minutes)
+            if isinstance(_exp_minutes, int):
+                  _newclaims['exp'] = self.set_new_exp_time(_exp_minutes)
             for claim in _claims:
                 if claim.name(signal) is not 'exp':
                     _newclaims[claim.name(signal)] = claim.value(signal)

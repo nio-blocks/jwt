@@ -10,7 +10,6 @@ class TestJWTCreate(NIOBlockTestCase):
         config = {
           'key': 'secret',
           'algorithm': 'HS256',
-          'exp_minutes': None,
           'claims': '{{ $claims }}'
         }
 
@@ -23,14 +22,13 @@ class TestJWTCreate(NIOBlockTestCase):
         self.assertEqual(0, self.last_signal_notified().error)
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
-        self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), { 'user_id': 'myUserId'})
+        self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), {'user_id': 'myUserId'})
         blk.stop()
 
     def test_create_token_without_claims(self):
         config = {
           'key': 'secret',
           'algorithm': 'HS256',
-          'exp_minutes': None,
           'claims': '{{ $claims }}'
         }
 
