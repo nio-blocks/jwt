@@ -25,6 +25,3 @@ class JWTBase(Block):
 
     def set_new_exp_time(self, exp_minutes):
         return int((datetime.datetime.utcnow() + datetime.timedelta(minutes=int(exp_minutes)).timestamp())
-
-
-
