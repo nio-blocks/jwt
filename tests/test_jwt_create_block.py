@@ -11,13 +11,13 @@ class TestJWTCreate(NIOBlockTestCase):
           'key': 'secret',
           'algorithm': 'HS256',
           'exp_minutes': None,
-          'claims': [{ 'name': 'user_id', 'value': 'myUserId'}]
+          'claims': '{{ $claims }}'
         }
 
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signals([{}])
+        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token creation successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
@@ -31,14 +31,14 @@ class TestJWTCreate(NIOBlockTestCase):
           'key': 'secret',
           'algorithm': 'HS256',
           'exp_minutes': 60,
-          'claims': [{ 'name': 'user_id', 'value': 'myUserId'}]
+          'claims': '{{ $claims }}'
         }
 
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
         expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
-        blk.process_signals([{}])
+        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token creation successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
@@ -78,7 +78,7 @@ Gp7fKL3Y2EeXaAhY91/vWrk/5lHlNR3rT6aq6qOAAIh0wyguhmGnjhQy/p1qVvH3
 -----END RSA PRIVATE KEY-----''',
           'algorithm': 'RS512',
           'exp_minutes': 60,
-          'claims': [{ 'name': 'user_id', 'value': 'myUserId'}]
+          'claims': '{{ $claims }}'
         }
 
         public_key_for_decypt = '''-----BEGIN PUBLIC KEY-----
@@ -95,7 +95,7 @@ qQIDAQAB
         blk.start()
         self.configure_block(blk, config)
         expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
-        blk.process_signals([{}])
+        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token creation successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
@@ -109,13 +109,13 @@ qQIDAQAB
           'key': 'secret',
           'algorithm': 'PS512',
           'exp_minutes': 60,
-          'claims': [{ 'name': 'user_id', 'value': 'myUserId'}]
+          'claims': '{{ $claims }}'
         }
 
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signals([{}])
+        blk.process_signals([Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })])
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Could not create new token: Could not deserialize key data.', self.last_signal_notified().message)
         self.assertEqual(1, self.last_signal_notified().error)

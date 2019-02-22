@@ -6,19 +6,26 @@ import datetime
 
 class TestJWTRefresh(NIOBlockTestCase):
 
-    def test_refresh_token_with_passing_expiration(self):
-        config = {
-          'key': 'secret',
-          'algorithm': 'HS256',
-          'exp_minutes': 60,
-          'input': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODIzMjg0OTIsInVzZXJfaWQiOiI1YzZkZDdjNjJjMWZlZGE3NTI0MzEyNmMifQ.tlrHNvcrki94CzkLyZSXKlBDI2skWhNOJsQ0Sh4fB_I'  # expires 02.21.20      
-        }
+    good_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1ODIzMjg0OTIsInVzZXJfaWQiOiI1YzZkZDdjNjJjMWZlZGE3NTI0MzEyNmMifQ.tlrHNvcrki94CzkLyZSXKlBDI2skWhNOJsQ0Sh4fB_I' # expires 02.21.20
+    expired_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTA3OTI2NDEsInVzZXJfaWQiOiI1YzZkZDdjNjJjMWZlZGE3NTI0MzEyNmMifQ.mhf7E_aNN8i5s3lJg7WEZWTwdjh9p7r1VOJ_bIqb0CI' # expired 02.21.19
+    no_expire_token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNWM2ZGQ3YzYyYzFmZWRhNzUyNDMxMjZjIn0.4WVCdTEZap2914UCBesiFCZcW-DvAUCLemERgn0eFwQ'
 
+    config = {
+      'key': 'secret',
+      'algorithm': 'HS256',
+      'validate_expiration': True,
+      'input': '{{ $headers.get(\'Authorization\').split()[1] }}'    
+    }
+
+    def test_refresh_token_with_passing_expiration(self):
+        config = self.config
+        config['exp_minutes'] = 60
         blk = JWTRefresh()
+
         blk.start()
         self.configure_block(blk, config)
         expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
-        blk.process_signals([{}])
+        blk.process_signals([Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.good_token } })])
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token refresh successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
@@ -28,35 +35,25 @@ class TestJWTRefresh(NIOBlockTestCase):
         blk.stop()
 
     def test_refresh_token_with_failing_expiration(self):
-        config = {
-          'key': 'secret',
-          'algorithm': 'HS256',
-          'exp_minutes': 60,
-          'input': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NTA3OTI2NDEsInVzZXJfaWQiOiI1YzZkZDdjNjJjMWZlZGE3NTI0MzEyNmMifQ.mhf7E_aNN8i5s3lJg7WEZWTwdjh9p7r1VOJ_bIqb0CI'  # expired 02.21.19      
-        }
-
+        config = self.config
         blk = JWTRefresh()
+
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signals([{}])
+        blk.process_signals([Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.expired_token } })])
         self.assert_num_signals_notified(1, blk)
-        self.assertEqual('Token is expired.', self.last_signal_notified().message)
+        self.assertEqual('Could not decrypt existing token: Signature has expired', self.last_signal_notified().message)
         self.assertEqual(1, self.last_signal_notified().error)
         self.assertIsNone(self.last_signal_notified().token)
         blk.stop()
 
     def test_refresh_token_without_expiration(self):
-        config = {
-          'key': 'secret',
-          'algorithm': 'HS256',
-          'validate_expiration': False,
-          'input': 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNWM2ZGQ3YzYyYzFmZWRhNzUyNDMxMjZjIn0.4WVCdTEZap2914UCBesiFCZcW-DvAUCLemERgn0eFwQ'  # no expiration      
-        }
-
+        config = self.config
         blk = JWTRefresh()
+
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signals([{}])
+        blk.process_signals([Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.no_expire_token } })])
         self.assert_num_signals_notified(1, blk)
         self.assertEqual('Token refresh successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
