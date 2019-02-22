@@ -14,7 +14,7 @@ class JWTCreate(EnrichSignals, JWTBase):
     exp_minutes = Property(title='Valid For Minutes (blank for no exp claim)', order=3, allow_none=True)
     claims = ListProperty(ClaimField, title='Claims', order=4, allow_none=True)
 
-    def process_signal(self, signal):
+    def process_signal(self, signal, input_id=None):
         _key = self.key(signal)
         _algorithm = self.algorithm(signal)
         _exp_minutes = self.exp_minutes(signal)

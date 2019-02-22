@@ -9,7 +9,7 @@ class JWTValidate(EnrichSignals, JWTBase):
 
     input = StringProperty(title='Token Value', default='{{ $headers.get(\'Authorization\').split()[1] }}', order=4)
 
-    def process_signal(self, signal):
+    def process_signal(self, signal, input_id=None):
         _key = self.key(signal)
         _algorithm = self.algorithm(signal)
         _token = self.input(signal)
