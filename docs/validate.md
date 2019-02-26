@@ -16,8 +16,8 @@ Properties
 
 Outputs
 -------
-- **Valid**: Token is valid
-- **Not Valid**: Token is not valid
+- **Success**: 1 signal containing an object {'token': String, 'error': Int = 0, 'message': String}
+- **Error**: 1 signal containing an object {'token': None, 'error': Int = 1, 'message': String}
 
 Commands
 --------
