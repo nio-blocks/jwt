@@ -11,7 +11,7 @@ class JWTRefresh(EnrichSignals, JWTBase):
     version = VersionProperty('0.1.0')
 
     input = StringProperty(title='Token Value', default='{{ $headers.get(\'Authorization\').split()[1] }}', order=3)
-    exp_minutes = Property(title='Valid For Minutes (exp claim)', default=60, order=4)
+    exp_minutes = Property(title='Valid For Minutes (exp claim)', order=4, allow_none=True)
 
     def process_signal(self, signal, input_id=None):
         _token = self.input(signal)

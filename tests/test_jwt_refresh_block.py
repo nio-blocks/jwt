@@ -26,7 +26,8 @@ class TestJWTRefresh(NIOBlockTestCase):
         self.configure_block(blk, config)
         expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.good_token } }))
-        self.assert_num_signals_notified(1, blk)
+        self.assert_num_signals_notified(1, blk, 'success')
+        self.assert_num_signals_notified(0, blk, 'error')
         self.assertEqual('Token refresh successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
         self.assertIsNotNone(self.last_signal_notified().token)
@@ -36,12 +37,14 @@ class TestJWTRefresh(NIOBlockTestCase):
 
     def test_refresh_token_with_failing_expiration(self):
         config = self.config
+        config['exp_minutes'] = 60
         blk = JWTRefresh()
 
         blk.start()
         self.configure_block(blk, config)
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.expired_token } }))
-        self.assert_num_signals_notified(1, blk)
+        self.assert_num_signals_notified(0, blk, 'success')
+        self.assert_num_signals_notified(1, blk, 'error')
         self.assertEqual('Signature has expired', self.last_signal_notified().message)
         self.assertEqual(1, self.last_signal_notified().error)
         self.assertIsNone(self.last_signal_notified().token)
@@ -49,12 +52,14 @@ class TestJWTRefresh(NIOBlockTestCase):
 
     def test_refresh_token_without_expiration(self):
         config = self.config
+        config['exp_minutes'] = None
         blk = JWTRefresh()
 
         blk.start()
         self.configure_block(blk, config)
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.no_expire_token } }))
-        self.assert_num_signals_notified(1, blk)
+        self.assert_num_signals_notified(1, blk, 'success')
+        self.assert_num_signals_notified(0, blk, 'error')
         self.assertEqual('Token refresh successful', self.last_signal_notified().message)
         self.assertEqual(0, self.last_signal_notified().error)
         self.assertIsNotNone(self.last_signal_notified().token)
