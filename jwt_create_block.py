@@ -3,6 +3,7 @@ from nio.block.mixins import EnrichSignals
 from nio.properties import PropertyHolder, StringProperty, Property, ListProperty, VersionProperty
 from nio.block import output
 from .jwt_base import JWTBase
+from jwt.exceptions import PyJWTError 
 import jwt
 
 class ClaimField(PropertyHolder):
@@ -34,6 +35,7 @@ class JWTCreate(EnrichSignals, JWTBase):
             _token = jwt.encode(_newclaims, _key, algorithm=_algorithm.value).decode('UTF-8')
             return self.notify_signals(self.get_output_signal({'token': _token, 'error': 0, 'message': 'Token creation successful' }, signal), 'success')
 
-        except Exception as e:
+        # jwt.encode throws ValueError if key is in wrong format
+        except (PyJWTError, ValueError) as e: 
             self.notify_signals(self.get_output_signal({'token': None, 'error': 1, 'message': e.args[0] }, signal), 'error')
 

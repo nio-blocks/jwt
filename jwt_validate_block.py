@@ -4,6 +4,7 @@ from nio.properties import StringProperty, VersionProperty
 from nio.block import output
 from .jwt_base import JWTBase
 import jwt
+from jwt.exceptions import PyJWTError
 
 @output('success', label='Success')
 @output('error', label='Error')
@@ -21,5 +22,5 @@ class JWTValidate(EnrichSignals, JWTBase):
             jwt.decode(_token, _key, algorithms=[_algorithm.value])
             return self.notify_signals(self.get_output_signal({'token': _token, 'error': 0, 'message': 'Token is valid' }, signal), 'success')
 
-        except Exception as e:
+        except PyJWTError as e:
             self.notify_signals(self.get_output_signal({'token': None, 'error': 1, 'message': e.args[0] }, signal), 'error')
