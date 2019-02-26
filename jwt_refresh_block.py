@@ -1,9 +1,12 @@
 from nio import Block
 from nio.block.mixins import EnrichSignals
 from nio.properties import StringProperty, Property, VersionProperty
+from nio.block import output
 from .jwt_base import JWTBase
 import jwt
 
+@output('success', label='Success')
+@output('error', label='Error')
 class JWTRefresh(EnrichSignals, JWTBase):
     version = VersionProperty('0.1.0')
 
@@ -28,7 +31,7 @@ class JWTRefresh(EnrichSignals, JWTBase):
                     pass
 
             _token = jwt.encode(_claims, _key, algorithm=_algorithm.value)
-            return self.notify_signals(self.get_output_signal({'token': _token.decode('UTF-8'), 'error': 0, 'message': 'Token refresh successful'}, signal))
+            return self.notify_signals(self.get_output_signal({'token': _token.decode('UTF-8'), 'error': 0, 'message': 'Token refresh successful'}, signal), 'success')
 
         except Exception as e:
-            self.notify_signals(self.get_output_signal({'token': None, 'error': 1, 'message': e.args[0] }, signal)) 
+            self.notify_signals(self.get_output_signal({'token': None, 'error': 1, 'message': e.args[0] }, signal), 'error') 
