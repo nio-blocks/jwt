@@ -1,6 +1,6 @@
 from nio import Block
 from nio.block.mixins import EnrichSignals
-from nio.properties import BoolProperty, SelectProperty, StringProperty, Property, ListProperty, VersionProperty
+from nio.properties import StringProperty, VersionProperty
 from .jwt_base import JWTBase
 import jwt
 
