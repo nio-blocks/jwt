@@ -132,5 +132,5 @@ qQIDAQAB
         blk.process_signal(Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] }))
         self.assert_num_signals_notified(0, blk, 'success')
         self.assert_num_signals_notified(1, blk, 'error')
-        self.assertEqual("ValueError('Could not deserialize key data.')", self.last_signal_notified().message)
+        self.assertEqual('Could not deserialize key data.', self.last_signal_notified().message)
         blk.stop()

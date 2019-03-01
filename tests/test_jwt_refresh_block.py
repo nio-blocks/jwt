@@ -43,7 +43,7 @@ class TestJWTRefresh(NIOBlockTestCase):
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.expired_token } }))
         self.assert_num_signals_notified(0, blk, 'success')
         self.assert_num_signals_notified(1, blk, 'error')
-        self.assertEqual("ExpiredSignatureError('Signature has expired')", self.last_signal_notified().message)
+        self.assertEqual('Signature has expired', self.last_signal_notified().message)
         blk.stop()
 
     def test_refresh_token_without_expiration(self):

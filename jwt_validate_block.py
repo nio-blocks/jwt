@@ -23,4 +23,4 @@ class JWTValidate(EnrichSignals, JWTBase):
             return self.notify_signals(self.get_output_signal({'token': _token }, signal), 'success')
 
         except PyJWTError as e:
-            self.notify_signals(self.get_output_signal({'message': repr(e) }, signal), 'error')
+            self.notify_signals(self.get_output_signal({'message': e.args[0] }, signal), 'error')
