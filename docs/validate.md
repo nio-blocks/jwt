@@ -16,8 +16,8 @@ Properties
 
 Outputs
 -------
-- **Success**: 1 signal containing an object {'token': String, 'error': Int = 0, 'message': String}
-- **Error**: 1 signal containing an object {'token': None, 'error': Int = 1, 'message': String}
+- **Valid**: 1 signal containing an object {'token': String}
+- **Not Valid**: 1 signal containing an object {'message': String}
 
 Commands
 --------

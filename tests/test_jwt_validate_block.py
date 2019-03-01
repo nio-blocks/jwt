@@ -25,8 +25,6 @@ class TestJWTValidate(NIOBlockTestCase):
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.good_token } }))
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
-        self.assertEqual('Token is valid', self.last_signal_notified().message)
-        self.assertEqual(0, self.last_signal_notified().error)
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
         self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), {'exp': 1582328492, 'user_id': '5c6dd7c62c1feda75243126c'})
@@ -41,9 +39,7 @@ class TestJWTValidate(NIOBlockTestCase):
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.expired_token } }))
         self.assert_num_signals_notified(0, blk, 'success')
         self.assert_num_signals_notified(1, blk, 'error')
-        self.assertEqual('Signature has expired', self.last_signal_notified().message)
-        self.assertEqual(1, self.last_signal_notified().error)
-        self.assertIsNone(self.last_signal_notified().token)
+        self.assertEqual("ExpiredSignatureError('Signature has expired')", self.last_signal_notified().message)
         blk.stop()
 
     def test_validate_token_without_expiration(self):
@@ -55,8 +51,6 @@ class TestJWTValidate(NIOBlockTestCase):
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.no_expire_token } }))
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
-        self.assertEqual('Token is valid', self.last_signal_notified().message)
-        self.assertEqual(0, self.last_signal_notified().error)
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
         self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), {'user_id': '5c6dd7c62c1feda75243126c'})
@@ -71,9 +65,7 @@ class TestJWTValidate(NIOBlockTestCase):
         blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNWM2ZGQ3YzYyYzFmZWRhNzUyNDMxMjZjIn0.BAD_PART' } }))
         self.assert_num_signals_notified(0, blk, 'success')
         self.assert_num_signals_notified(1, blk, 'error')
-        self.assertEqual('Signature verification failed', self.last_signal_notified().message)
-        self.assertEqual(1, self.last_signal_notified().error)
-        self.assertIsNone(self.last_signal_notified().token)
+        self.assertEqual("InvalidSignatureError('Signature verification failed')", self.last_signal_notified().message)
         blk.stop()
 
     

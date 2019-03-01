@@ -10,7 +10,7 @@ class ClaimField(PropertyHolder):
     name = StringProperty(title='Name', order=0)
     value = Property(title='Value', order=1)
 
-@output('success', label='Success')
+@output('success', label='Success', default=True)
 @output('error', label='Error')
 class JWTCreate(EnrichSignals, JWTBase):
     version = VersionProperty('0.1.0')
@@ -33,9 +33,9 @@ class JWTCreate(EnrichSignals, JWTBase):
                     _newclaims[claim.name(signal)] = claim.value(signal)
 
             _token = jwt.encode(_newclaims, _key, algorithm=_algorithm.value).decode('UTF-8')
-            return self.notify_signals(self.get_output_signal({'token': _token, 'error': 0, 'message': 'Token creation successful' }, signal), 'success')
+            return self.notify_signals(self.get_output_signal({'token': _token }, signal), 'success')
 
         # jwt.encode throws ValueError if key is in wrong format
         except (PyJWTError, ValueError) as e: 
-            self.notify_signals(self.get_output_signal({'token': None, 'error': 1, 'message': e.args[0] }, signal), 'error')
+            self.notify_signals(self.get_output_signal({'message': repr(e) }, signal), 'error')
 
