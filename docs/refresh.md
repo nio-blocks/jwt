@@ -16,7 +16,8 @@ Properties
 
 Outputs
 -------
-One outgoing signal containing the updated token.
+- **Success**: 1 signal containing an object {'token': String}
+- **Error**: 1 signal containing an object {'message': String}
 
 Commands
 --------

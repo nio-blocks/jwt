@@ -1,0 +1,17 @@
+{
+  "nio/JWTCreate": {
+    "language": "Python",
+    "url": "git://github.com/nio-blocks/jwt.git",
+    "from_python": "jwt_create_block.JWTCreate"
+  },
+  "nio/JWTValidate": {
+    "language": "Python",
+    "url": "git://github.com/nio-blocks/jwt.git",
+    "from_python": "jwt_validate_block.JWTValidate"
+  },
+  "nio/JWTRefresh": {
+    "language": "Python",
+    "url": "git://github.com/nio-blocks/jwt.git",
+    "from_python": "jwt_refresh_block.JWTRefresh"
+  }
+}

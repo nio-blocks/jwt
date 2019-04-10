@@ -1,0 +1,26 @@
+{
+  "nio/JWTCreate": {
+    "description": "generate a JWT token encrypted with the selected algorithm",
+    "from_readme":"docs/create.md",
+    "from_python":"jwt_create_block.JWTCreate",
+    "categories": [
+      "security"
+    ]
+  },
+  "nio/JWTValidate": {
+    "description": "evaluate a JWT token and determines whether it is valid, both in terms of being able to decrypt it, as well as if it is expired based on the `exp` claim",
+    "from_readme":"docs/validate.md",
+    "from_python":"jwt_validate_block.JWTValidate",
+    "categories": [
+      "security"
+    ]
+  },
+  "nio/JWTRefresh": {
+    "description": "takes a valid JWT token and returns a new token with an updated `exp` timestamp",
+    "from_readme":"docs/refresh.md",
+    "from_python":"jwt_refresh_block.JWTRefresh",
+    "categories": [
+      "security"
+    ]
+  }
+}
