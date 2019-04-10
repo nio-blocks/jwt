@@ -1,2 +1,2 @@
 cryptography
-pyjwt
+pyjwt~=1.7
