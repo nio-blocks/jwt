@@ -33,7 +33,7 @@ class JWTCreate(EnrichSignals, JWTBase):
                     _newclaims[claim.name(signal)] = claim.value(signal)
 
             _token = jwt.encode(_newclaims, _key, algorithm=_algorithm.value).decode('UTF-8')
-            return self.notify_signals(self.get_output_signal({'token': _token }, signal), 'success')
+            return self.get_output_signal({'token': _token}, signal)
 
         # jwt.encode throws ValueError if key is in wrong format
         except (PyJWTError, ValueError) as e: 

@@ -32,7 +32,7 @@ class JWTRefresh(EnrichSignals, JWTBase):
                     pass
 
             _token = jwt.encode(_claims, _key, algorithm=_algorithm.value)
-            return self.notify_signals(self.get_output_signal({'token': _token.decode('UTF-8')}, signal), 'success')
+            return self.get_output_signal({'token': _token.decode('UTF-8')}, signal)
 
         except PyJWTError as e:
             self.notify_signals(self.get_output_signal({'message': e.args[0] }, signal), 'error') 

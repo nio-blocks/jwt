@@ -22,7 +22,9 @@ class TestJWTValidate(NIOBlockTestCase):
 
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.good_token } }))
+        blk.process_signals([
+            Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.good_token } })
+        ])
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
         self.assertIsNotNone(self.last_signal_notified().token)
@@ -36,7 +38,9 @@ class TestJWTValidate(NIOBlockTestCase):
 
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.expired_token } }))
+        blk.process_signals([
+            Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.expired_token } })
+        ])
         self.assert_num_signals_notified(0, blk, 'success')
         self.assert_num_signals_notified(1, blk, 'error')
         self.assertEqual('Signature has expired', self.last_signal_notified().message)
@@ -48,7 +52,9 @@ class TestJWTValidate(NIOBlockTestCase):
 
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.no_expire_token } }))
+        blk.process_signals([
+            Signal({ 'headers' : { 'Authorization': 'Bearer ' + self.no_expire_token } })
+        ])
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
         self.assertIsNotNone(self.last_signal_notified().token)
@@ -62,10 +68,10 @@ class TestJWTValidate(NIOBlockTestCase):
 
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signal(Signal({ 'headers' : { 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNWM2ZGQ3YzYyYzFmZWRhNzUyNDMxMjZjIn0.BAD_PART' } }))
+        blk.process_signals([
+            Signal({ 'headers' : { 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiNWM2ZGQ3YzYyYzFmZWRhNzUyNDMxMjZjIn0.BAD_PART' } })
+        ])
         self.assert_num_signals_notified(0, blk, 'success')
         self.assert_num_signals_notified(1, blk, 'error')
         self.assertEqual('Signature verification failed', self.last_signal_notified().message)
         blk.stop()
-
-    
