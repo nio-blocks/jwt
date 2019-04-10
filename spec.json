@@ -4,7 +4,7 @@
     "from_readme":"docs/create.md",
     "from_python":"jwt_create_block.JWTCreate",
     "categories": [
-      "Web Data"
+      "security"
     ]
   },
   "nio/JWTValidate": {
@@ -12,7 +12,7 @@
     "from_readme":"docs/validate.md",
     "from_python":"jwt_validate_block.JWTValidate",
     "categories": [
-      "Web Data"
+      "security"
     ]
   },
   "nio/JWTRefresh": {
@@ -20,7 +20,7 @@
     "from_readme":"docs/refresh.md",
     "from_python":"jwt_refresh_block.JWTRefresh",
     "categories": [
-      "Web Data"
+      "security"
     ]
   }
 }
