@@ -37,6 +37,5 @@ class JWTCreate(EnrichSignals, JWTBase):
 
         # jwt.encode throws ValueError if key is in wrong format
         except (PyJWTError, ValueError) as e: 
-            print(repr(e))
             self.notify_signals(self.get_output_signal({'message': e.args[0] }, signal), 'error')
 
