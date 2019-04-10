@@ -4,6 +4,7 @@ from ..jwt_create_block import JWTCreate
 import jwt
 import datetime
 
+
 class TestJWTCreate(NIOBlockTestCase):
 
     def test_create_token_without_expiration(self):
@@ -17,13 +18,18 @@ class TestJWTCreate(NIOBlockTestCase):
         blk.start()
         self.configure_block(blk, config)
         blk.process_signals([
-            Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })
+            Signal({'claims': [{'name': 'user_id', 'value': 'myUserId'}]})
         ])
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
-        self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), {'user_id': 'myUserId'})
+        self.assertEqual(
+            jwt.decode(
+                self.last_signal_notified().token,
+                'secret',
+                algorithms=['HS256']),
+            {'user_id': 'myUserId'})
         blk.stop()
 
     def test_create_token_without_claims(self):
@@ -36,12 +42,17 @@ class TestJWTCreate(NIOBlockTestCase):
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
-        blk.process_signals([Signal({ 'claims' : [] })])
+        blk.process_signals([Signal({'claims': []})])
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
-        self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), {})
+        self.assertEqual(
+            jwt.decode(
+                self.last_signal_notified().token,
+                'secret',
+                algorithms=['HS256']),
+            {})
         blk.stop()
 
     def test_create_token_with_expiration(self):
@@ -55,15 +66,22 @@ class TestJWTCreate(NIOBlockTestCase):
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
-        expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
+        expected_expiration = int((
+            datetime.datetime.utcnow() +
+            datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
         blk.process_signals([
-            Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })
+            Signal({'claims': [{'name': 'user_id', 'value': 'myUserId'}]})
         ])
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
-        self.assertEqual(jwt.decode(self.last_signal_notified().token, 'secret', algorithms=['HS256']), { 'exp': expected_expiration, 'user_id': 'myUserId'})
+        self.assertEqual(
+            jwt.decode(
+                self.last_signal_notified().token,
+                'secret',
+                algorithms=['HS256']),
+            {'exp': expected_expiration, 'user_id': 'myUserId'})
         blk.stop()
 
     def test_create_token_with_rsa_and_keys(self):
@@ -113,15 +131,22 @@ qQIDAQAB
         blk = JWTCreate()
         blk.start()
         self.configure_block(blk, config)
-        expected_expiration= int((datetime.datetime.utcnow() + datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
+        expected_expiration = int((
+            datetime.datetime.utcnow() +
+            datetime.timedelta(minutes=config['exp_minutes'])).timestamp())
         blk.process_signals([
-            Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })
+            Signal({'claims': [{'name': 'user_id', 'value': 'myUserId'}]})
         ])
         self.assert_num_signals_notified(1, blk, 'success')
         self.assert_num_signals_notified(0, blk, 'error')
         self.assertIsNotNone(self.last_signal_notified().token)
         self.assertEqual(type(self.last_signal_notified().token), str)
-        self.assertEqual(jwt.decode(self.last_signal_notified().token, public_key_for_decypt, algorithms=['RS512']), { 'exp': expected_expiration, 'user_id': 'myUserId'})
+        self.assertEqual(
+            jwt.decode(
+                self.last_signal_notified().token,
+                public_key_for_decypt,
+                algorithms=['RS512']),
+            {'exp': expected_expiration, 'user_id': 'myUserId'})
         blk.stop()
 
     def test_fail_with_invalid_key_for_algorithm(self):
@@ -136,9 +161,11 @@ qQIDAQAB
         blk.start()
         self.configure_block(blk, config)
         blk.process_signals([
-            Signal({ 'claims' : [{ 'name': 'user_id', 'value': 'myUserId'}] })
+            Signal({'claims': [{'name': 'user_id', 'value': 'myUserId'}]})
         ])
         self.assert_num_signals_notified(0, blk, 'success')
         self.assert_num_signals_notified(1, blk, 'error')
-        self.assertEqual('Could not deserialize key data.', self.last_signal_notified().message)
+        self.assertEqual(
+            'Could not deserialize key data.',
+            self.last_signal_notified().message)
         blk.stop()

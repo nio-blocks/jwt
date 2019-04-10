@@ -4,6 +4,7 @@ from nio.properties import SelectProperty, Property
 from nio.util.discovery import not_discoverable
 import datetime
 
+
 class Algorithms(Enum):
     HS256 = 'HS256'
     HS384 = 'HS384'
@@ -18,10 +19,18 @@ class Algorithms(Enum):
     PS384 = 'PS384'
     PS512 = 'PS512'
 
+
 @not_discoverable
 class JWTBase(Block):
     key = Property(title='JWT Secret', default='[[JWT_SECRET]]', order=1)
-    algorithm = SelectProperty(Algorithms, title='Hashing Algorithm', default=Algorithms.HS256, order=2)
+    algorithm = SelectProperty(
+        Algorithms,
+        title='Hashing Algorithm',
+        default=Algorithms.HS256,
+        order=2)
 
     def set_new_exp_time(self, exp_minutes):
-        return int((datetime.datetime.utcnow() + datetime.timedelta(minutes=int(exp_minutes))).timestamp())
+        return int((
+            datetime.datetime.utcnow() +
+            datetime.timedelta(minutes=int(exp_minutes))
+        ).timestamp())
